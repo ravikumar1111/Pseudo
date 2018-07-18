@@ -2,12 +2,13 @@ package com.pseudoi.app.model;
 
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.PrimaryKey;
+import android.support.annotation.NonNull;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 @Entity
 public class BeerCraft {
-
+    @NonNull
     @PrimaryKey(autoGenerate = true)
     private int entryId;
     private int orderStatus;
@@ -46,6 +47,10 @@ public class BeerCraft {
     @SerializedName("ounces")
     @Expose
     private Double ounces;
+
+    @SerializedName("addedToChart")
+    @Expose
+    private boolean addedToChart;
 
     public String getAbv() {
         return abv;
@@ -93,5 +98,9 @@ public class BeerCraft {
 
     public void setOunces(Double ounces) {
         this.ounces = ounces;
+    }
+
+    public boolean isAddedToChart() {
+        return addedToChart;
     }
 }

@@ -1,9 +1,11 @@
 package com.pseudoi.app.adapter;
 
+import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.pseudoi.app.R;
@@ -14,16 +16,34 @@ import java.util.List;
 public class BeerChartRecyclerView extends RecyclerView.Adapter<BeerChartRecyclerView.MyViewHolder> {
 
     private List<BeerCraft> moviesList;
+    private Context mContext;
 
-    public class MyViewHolder extends RecyclerView.ViewHolder {
+    public class MyViewHolder extends RecyclerView.ViewHolder  implements View.OnClickListener{
         public TextView title, category, content;
+        public ImageView addItem;
 
         public MyViewHolder(View view) {
             super(view);
             title = (TextView) view.findViewById(R.id.name);
             category = (TextView) view.findViewById(R.id.category);
             content = (TextView) view.findViewById(R.id.content);
-            //genre = (TextView) view.findViewById(R.id.textViewVersion);
+            addItem = (ImageView) view.findViewById(R.id.addItem);
+            addItem.setOnClickListener(this);
+        }
+
+        @Override
+        public void onClick(View view) {
+
+            switch (view.getId()){
+
+                case R.id.addItem:
+
+                    break;
+
+                default:
+                    break;
+            }
+
         }
     }
 
@@ -58,4 +78,5 @@ public class BeerChartRecyclerView extends RecyclerView.Adapter<BeerChartRecycle
     public int getItemCount() {
         return moviesList.size();
     }
+
 }

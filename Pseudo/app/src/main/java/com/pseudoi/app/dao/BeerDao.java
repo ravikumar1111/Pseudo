@@ -17,4 +17,10 @@ public interface BeerDao {
 
     @Query("SELECT * FROM BeerCraft")
     List<BeerCraft> getAll();
+
+    @Query("SELECT * FROM BeerCraft where addedToChart = :addedToChart")
+    List<BeerCraft> getBeerCrafById(boolean addedToChart);
+
+    @Query("UPDATE BeerCraft SET entryId = :entryId WHERE addedToChart = :addedToChart")
+    boolean getBeerCrafById1 (int entryId, boolean addedToChart);
 }

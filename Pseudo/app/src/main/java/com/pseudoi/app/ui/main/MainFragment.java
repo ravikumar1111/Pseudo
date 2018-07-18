@@ -17,6 +17,7 @@ import android.widget.AutoCompleteTextView;
 
 import com.pseudoi.app.R;
 import com.pseudoi.app.adapter.BeerChartRecyclerView;
+import com.pseudoi.app.com.pseudoi.app.utils.Utilities;
 import com.pseudoi.app.dao.AppDatabase;
 import com.pseudoi.app.model.BeerCraft;
 import com.pseudoi.app.webservice.APIClient;
@@ -41,7 +42,7 @@ public class MainFragment extends Fragment {
     private AppDatabase db;
     private List<BeerCraft> contacts = null;
 
-
+    private AppDatabase movieDatabase;
     public static MainFragment newInstance() {
         return new MainFragment();
     }
@@ -87,6 +88,7 @@ public class MainFragment extends Fragment {
                 Log.d("Response::","Count:::"+beerList.size());
                // Collections.sort(beerList, (p1, p2) -> p1.getAbv().compareTo(p2.getAbv()));
                 recyclerViewAdapter.UpdateData(beerList);
+                saveBeerTable(beerList);
             }
 
             @Override
@@ -94,5 +96,21 @@ public class MainFragment extends Fragment {
 
             }
         });
+    }
+
+    private void saveBeerTable(List<BeerCraft> beerList){
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                movieDatabase = Room.databaseBuilder(getContext(),
+                        AppDatabase.class, Utilities.DATABASE_NAME).fallbackToDestructiveMigration().build();
+                //.fallbackToDesctructiveMigration()
+                //.build();
+                movieDatabase.beerDao().insertMultipleListRecord(beerList);
+                List<BeerCraft> beerListData =  movieDatabase.beerDao().getAll();
+                Log.d("","beerListData:: "+ beerListData.size());
+            }
+        }) .start();
     }
 }
