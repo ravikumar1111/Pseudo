@@ -1,14 +1,20 @@
 package com.pseudoi.app.adapter;
 
+import android.arch.persistence.room.Room;
 import android.content.Context;
+import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.pseudoi.app.ChartActivity;
 import com.pseudoi.app.R;
+import com.pseudoi.app.com.pseudoi.app.utils.Utilities;
+import com.pseudoi.app.dao.AppDatabase;
 import com.pseudoi.app.model.BeerCraft;
 
 import java.util.List;
@@ -17,6 +23,7 @@ public class BeerChartRecyclerView extends RecyclerView.Adapter<BeerChartRecycle
 
     private List<BeerCraft> moviesList;
     private Context mContext;
+    private boolean isChartView;
 
     public class MyViewHolder extends RecyclerView.ViewHolder  implements View.OnClickListener{
         public TextView title, category, content;
@@ -29,6 +36,9 @@ public class BeerChartRecyclerView extends RecyclerView.Adapter<BeerChartRecycle
             content = (TextView) view.findViewById(R.id.content);
             addItem = (ImageView) view.findViewById(R.id.addItem);
             addItem.setOnClickListener(this);
+            if(isChartView){
+                addItem.setVisibility(View.GONE);
+            }
         }
 
         @Override
@@ -38,6 +48,22 @@ public class BeerChartRecyclerView extends RecyclerView.Adapter<BeerChartRecycle
 
                 case R.id.addItem:
 
+                    AppDatabase  movieDatabase = Room.databaseBuilder(mContext,
+                            AppDatabase.class, Utilities.DATABASE_NAME).fallbackToDestructiveMigration().build();
+
+                   moviesList.get(getAdapterPosition()).setStatus("Order");
+                   // mSelectedItem.setStatus("Order");
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            movieDatabase.beerDao().insertMultipleListRecord(moviesList);
+                           // movieDatabase.beerDao().updBeerCrafStatus(mSelectedItem.getEntryId(),"Order");
+                            int sizeValue = movieDatabase.beerDao().getBeerCrafByStatus("Order").size();
+                            Log.d("Data Size:: ", "Size::: "+sizeValue) ;
+                        }
+                    }) .start();
+
+                   // mContext.startActivity(new Intent(mContext, ChartActivity.class));
                     break;
 
                 default:
@@ -47,15 +73,17 @@ public class BeerChartRecyclerView extends RecyclerView.Adapter<BeerChartRecycle
         }
     }
 
-    public void UpdateData(List<BeerCraft> moviesList){
+    public void UpdateData(List<BeerCraft> moviesList, Context context){
 
         this.moviesList = moviesList;
+        mContext = context;
         notifyDataSetChanged();
     }
 
 
-    public BeerChartRecyclerView(List<BeerCraft> moviesList) {
+    public BeerChartRecyclerView(List<BeerCraft> moviesList, boolean isChartView) {
         this.moviesList = moviesList;
+        this.isChartView = isChartView;
     }
 
     @Override

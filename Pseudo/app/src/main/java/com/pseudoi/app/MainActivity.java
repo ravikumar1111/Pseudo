@@ -1,7 +1,9 @@
 package com.pseudoi.app;
 
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.View;
 
 import com.pseudoi.app.ui.main.MainFragment;
 
@@ -12,9 +14,20 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main_activity);
         if (savedInstanceState == null) {
-            getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.container, MainFragment.newInstance())
-                    .commitNow();
+            try{
+                getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.container, MainFragment.newInstance())
+                        .commitNow();
+            }catch (Exception e){
+
+                e.getMessage();
+            }
+
         }
+    }
+
+    public void openActivity(View view){
+
+        startActivity(new Intent(getApplicationContext(), ChartActivity.class));
     }
 }

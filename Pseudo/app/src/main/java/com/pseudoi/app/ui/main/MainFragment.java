@@ -8,12 +8,15 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
+import android.widget.EditText;
 
 import com.pseudoi.app.R;
 import com.pseudoi.app.adapter.BeerChartRecyclerView;
@@ -38,7 +41,7 @@ public class MainFragment extends Fragment {
     private RecyclerView recyclerView;
     private List<BeerCraft> beerList = new ArrayList<BeerCraft>();
     private ArrayAdapter<String> beerNameAutoSearchAdapter = null;
-    private AutoCompleteTextView nameAutoCompleteTextView = null;
+    private EditText nameAutoCompleteTextView = null;
     private AppDatabase db;
     private List<BeerCraft> contacts = null;
 
@@ -63,19 +66,62 @@ public class MainFragment extends Fragment {
 
     private void initView(){
         recyclerView = (RecyclerView) getActivity().findViewById(R.id.beerChartRecyclerView);
-        recyclerViewAdapter = new BeerChartRecyclerView(beerList);
+        recyclerViewAdapter = new BeerChartRecyclerView(beerList, false);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         recyclerView.setAdapter(recyclerViewAdapter);
         db = Room.databaseBuilder(getActivity(), AppDatabase.class, "database").build();
         beerNameAutoSearchAdapter = new ArrayAdapter<String>
                 (getActivity(), android.R.layout.select_dialog_item, new ArrayList<String>());
         //Getting the instance of AutoCompleteTextView
-        nameAutoCompleteTextView = (AutoCompleteTextView) getActivity().findViewById(R.id.nameAutoCompleteTextView);
-        nameAutoCompleteTextView.setThreshold(1);//will start working from first character
-        nameAutoCompleteTextView.setAdapter(beerNameAutoSearchAdapter);//setting the adapter data into the AutoCompleteTextView
+        nameAutoCompleteTextView = (EditText) getActivity().findViewById(R.id.nameAutoCompleteTextView);
+       /* nameAutoCompleteTextView.setThreshold(3);//will start working from first character
+        nameAutoCompleteTextView.setAdapter(beerNameAutoSearchAdapter);//setting the adapter data into the AutoCompleteTextView*/
 
+        nameAutoCompleteTextView.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        if(beerList != null && recyclerViewAdapter != null){
+                            beerList = db.beerDao().getBeerCrafByName(s.toString());
+                            if(beerList.size() >0 ){
+                                recyclerViewAdapter.UpdateData(beerList, getActivity());
+                            }else{
+                                GetAllBeerCraftData();
+                            }
+                        }
+
+                    }
+                }) .start();
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+
+            }
+        });
         mViewModel = ViewModelProviders.of(this).get(MainViewModel.class);
     }
+    private void GetAllBeerCraftData() {
+
+
+        movieDatabase = Room.databaseBuilder(getContext(),
+                AppDatabase.class, Utilities.DATABASE_NAME).fallbackToDestructiveMigration().build();
+
+        beerList = movieDatabase.beerDao().getAll();
+        Log.d("", "beerListData:: " + beerList.size());
+        recyclerViewAdapter.UpdateData(beerList, getActivity());
+    }
+
 
     private void GetBeerCraftData(){
 
@@ -87,7 +133,7 @@ public class MainFragment extends Fragment {
                 beerList  = response.body();
                 Log.d("Response::","Count:::"+beerList.size());
                // Collections.sort(beerList, (p1, p2) -> p1.getAbv().compareTo(p2.getAbv()));
-                recyclerViewAdapter.UpdateData(beerList);
+                recyclerViewAdapter.UpdateData(beerList, getActivity());
                 saveBeerTable(beerList);
             }
 

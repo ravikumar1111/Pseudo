@@ -4,6 +4,7 @@ import android.arch.persistence.room.Dao;
 import android.arch.persistence.room.Insert;
 import android.arch.persistence.room.OnConflictStrategy;
 import android.arch.persistence.room.Query;
+import android.arch.persistence.room.Update;
 
 import com.pseudoi.app.model.BeerCraft;
 
@@ -18,9 +19,17 @@ public interface BeerDao {
     @Query("SELECT * FROM BeerCraft")
     List<BeerCraft> getAll();
 
-    @Query("SELECT * FROM BeerCraft where addedToChart = :addedToChart")
-    List<BeerCraft> getBeerCrafById(boolean addedToChart);
+    @Query("SELECT * FROM BeerCraft WHERE status LIKE :status")
+    List<BeerCraft> getBeerCrafByStatus(String status);
 
-    @Query("UPDATE BeerCraft SET entryId = :entryId WHERE addedToChart = :addedToChart")
-    boolean getBeerCrafById1 (int entryId, boolean addedToChart);
+    @Query("UPDATE BeerCraft SET status = :status WHERE entryId = :entryId")
+    void updBeerCrafStatus (int entryId, String status);
+
+    @Update
+   void updBeerCrafStatus (BeerCraft beerCraft);
+
+    @Query("SELECT * FROM BeerCraft WHERE name = :name")
+    List<BeerCraft> getBeerCrafByName(String name);
+
+
 }

@@ -1,5 +1,6 @@
 package com.pseudoi.app.model;
 
+import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.PrimaryKey;
 import android.support.annotation.NonNull;
@@ -31,26 +32,30 @@ public class BeerCraft {
 
     @SerializedName("abv")
     @Expose
+    @ColumnInfo(name ="abv")
     private String abv;
     @SerializedName("ibu")
     @Expose
+    @ColumnInfo(name ="ibu")
     private String ibu;
     @SerializedName("id")
     @Expose
+    @ColumnInfo(name ="id")
     private Integer id;
     @SerializedName("name")
     @Expose
+    @ColumnInfo(name ="name")
     private String name;
     @SerializedName("style")
     @Expose
+    @ColumnInfo(name ="style")
     private String style;
     @SerializedName("ounces")
     @Expose
+    @ColumnInfo(name ="ounces")
     private Double ounces;
 
-    @SerializedName("addedToChart")
-    @Expose
-    private boolean addedToChart;
+
 
     public String getAbv() {
         return abv;
@@ -100,7 +105,18 @@ public class BeerCraft {
         this.ounces = ounces;
     }
 
-    public boolean isAddedToChart() {
-        return addedToChart;
+
+    public void setStatus(String status) {
+        this.status = status;
     }
+
+    public String getStatus() {
+
+        return status;
+    }
+
+    @SerializedName("status")
+    @Expose
+    @ColumnInfo(name ="status")
+    private String status;
 }
